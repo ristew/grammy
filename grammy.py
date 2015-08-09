@@ -1,7 +1,10 @@
 import random
+import sys
+import time
 
 cache = {}
 text = ""
+num_chars = 2
 
 def read_file(filename):
     global text
@@ -10,33 +13,48 @@ def read_file(filename):
     f.close()
     parse_text()
 
+def cache_grab(chars):
+    if len(chars) < 2:
+        return ' '
+    try:
+        return random.choice(cache[tuple(c for c in chars)])
+    except:
+        return cache_grab(chars[1:])
+
 def parse_text():
+    global num_chars
     for i, c in enumerate(text):
         if i > 2:
-            key = (text[i - 3], text[i - 2], text[i - 1])
-            key2 = (text[i - 2], text[i - 1])
-            if key in cache:
-                cache[key].append(c)
-            else:
-                cache[key] = [c]
-            if key2 in cache:
-                cache[key2].append(c)
-            else:
-                cache[key2] = [c]
+            for j in range(2, num_chars + 2):
+                key = tuple(text[i - j + k] for k in range(1, j))
+                if key in cache:
+                    cache[key].append(c)
+                else:
+                    cache[key] = [c]
 
 def gen(size=100):
-    seed = random.randint(0, len(text) - 3)
-    c1, c2, c3 = text[seed], text[seed + 1], text[seed + 2]
-    gen_ = []
-    for i in xrange(size):
-        gen_.append(c1)
-        try:
-            c1, c2, c3 = c2, c3, random.choice(cache[(c1, c2, c3)])
-        except:
-            try:
-                c1, c2, c3 = c2, c3, random.choice(cache[(c2, c3)])
-            except:
-                c1, c2, c3 = c2, c3, random.choice(text)
+    gen = []
+    gen_text_for_chars(setup_seed(), gen, size)
+    return ''.join(gen)
 
-    gen_.append(c2)
-    return ''.join(gen_)
+def slow_gen():
+    chars = setup_seed()
+    while True:
+        gen = []
+        chars = gen_text_for_chars(chars, gen,  1)
+        sys.stdout.write(''.join(gen))
+        sys.stdout.flush()
+        time.sleep(0.08)
+
+def setup_seed():
+    seed = 0
+    chars = [text[s] for s in range(seed, seed + num_chars)]
+    return chars
+
+def gen_text_for_chars(chars, gen_, times):
+    for i in range(times):
+        gen_.append(chars[0])
+        c = cache_grab(chars)
+        chars.append(c)
+        chars = chars[1:]
+    return chars
