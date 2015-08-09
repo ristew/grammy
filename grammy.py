@@ -1,10 +1,12 @@
 import random
+import click
 import sys
 import time
+import random
 
 cache = {}
 text = ""
-num_chars = 2
+num_chars = 3
 
 def read_file(filename):
     global text
@@ -23,6 +25,7 @@ def cache_grab(chars):
 
 def parse_text():
     global num_chars
+    print num_chars
     for i, c in enumerate(text):
         if i > 2:
             for j in range(2, num_chars + 2):
@@ -35,7 +38,7 @@ def parse_text():
 def gen(size=100):
     gen = []
     gen_text_for_chars(setup_seed(), gen, size)
-    return ''.join(gen)
+    print ''.join(gen)
 
 def slow_gen():
     chars = setup_seed()
@@ -44,7 +47,7 @@ def slow_gen():
         chars = gen_text_for_chars(chars, gen,  1)
         sys.stdout.write(''.join(gen))
         sys.stdout.flush()
-        time.sleep(0.08)
+        time.sleep(random.random() * 0.2 + 0.1)
 
 def setup_seed():
     seed = 0
@@ -58,3 +61,22 @@ def gen_text_for_chars(chars, gen_, times):
         chars.append(c)
         chars = chars[1:]
     return chars
+
+@click.command()
+@click.argument('filename')
+@click.option('--depth', default=3)
+@click.option('--continuous/--at-once', default=False)
+@click.option('--length', default=200)
+def main(filename, depth, continuous, length):
+    global num_chars
+    num_chars = int(depth)
+    read_file(filename)
+    if continuous:
+        slow_gen()
+    else:
+        gen(length)
+    
+
+
+if __name__=="__main__":
+    main()
