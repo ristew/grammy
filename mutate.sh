@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #run $1 file, $2 number iterations
-echo "  " > tmp.txt
 cat $1 > tmp.txt
 len="$(wc -c $1 | awk '{print $1}')"
 
