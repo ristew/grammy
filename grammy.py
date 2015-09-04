@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import random
 import click
 import sys
@@ -25,7 +26,6 @@ def cache_grab(chars):
 
 def parse_text():
     global num_chars
-    print num_chars
     for i, c in enumerate(text):
         if i > 2:
             for j in range(2, num_chars + 2):
