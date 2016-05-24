@@ -38,7 +38,7 @@ def parse_text():
 def gen(size=100):
     gen = []
     gen_text_for_chars(setup_seed(), gen, size)
-    print ''.join(gen)
+    return ''.join(gen)
 
 def slow_gen():
     chars = setup_seed()
@@ -47,10 +47,10 @@ def slow_gen():
         chars = gen_text_for_chars(chars, gen,  1)
         sys.stdout.write(''.join(gen))
         sys.stdout.flush()
-        time.sleep(random.random() * 0.2 + 0.1)
+        time.sleep(random.random() * 0.1 + 0.1)
 
 def setup_seed():
-    seed = 0
+    seed = random.randint(0, len(text) - num_chars - 1)
     chars = [text[s] for s in range(seed, seed + num_chars)]
     return chars
 
@@ -74,7 +74,7 @@ def main(filename, depth, continuous, length):
     if continuous:
         slow_gen()
     else:
-        gen(length)
+        print(gen(length))
     
 
 
